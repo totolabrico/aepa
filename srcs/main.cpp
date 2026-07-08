@@ -7,11 +7,9 @@ void print_header()
 {
     std::ifstream logo("logo.txt");
     std::string line;
-    std::cout << "\033[31m";
     while (getline(logo, line))
         std::cout << line << std::endl;
     std::cout << std::endl;
-    std::cout << "\033[34m";
     std::cout << "DURATION (O | L)\t\tLAYER SIZE (P | M)" << std::endl;
     std::cout << "\033[0m" << std::endl;
 }
