@@ -5,13 +5,23 @@
 Reverb::Reverb() : _head(0), _head_layer(0)
 {
     pthread_mutex_init(&_mutex, NULL);
-    SetLayerSize(20);
-    SetDuration(10.0);
+    SetLayerSize(10);
+    SetDuration(0.1);
 }
 
 Reverb::~Reverb()
 {
     pthread_mutex_destroy(&_mutex);
+}
+
+size_t Reverb::GetLayerSize() const
+{
+    return _layer_size;
+}
+
+float Reverb::GetDuration() const
+{
+    return _duration;
 }
 
 void Reverb::SetLayerSize(size_t value)
@@ -27,17 +37,39 @@ void Reverb::SetLayerSize(size_t value)
     }
     if (_head_layer >= _layer_size)
         _head_layer = 0;
+    SetDuration(_duration);
+}
+
+void Reverb::IncLayerSize(int value)
+{
+    pthread_mutex_lock(&_mutex);
+    if (!(value < 0 && _layer_size <= static_cast<size_t>(-value)))
+        SetLayerSize(_layer_size + value);
+    pthread_mutex_unlock(&_mutex);
 }
 
 void Reverb::SetDuration(float value)
 {
-    std::cout << "Reverb set duration to " << value << std::endl;
     _duration = value;
-    _buffer_size = static_cast<size_t>(PcmSetting::FRAME_RATE * _duration / _layer_size);
+    _buffer_size = static_cast<size_t>(PcmSetting::FRAME_RATE * _duration);
     for (auto &buffer : _buffers)
-        buffer.resize(_buffer_size, 0.0);
+    {
+        if (buffer.size() != _buffer_size)
+            buffer.resize(_buffer_size, 0.0);
+    }
     if (_head > _buffer_size)
         _head = 0;
+}
+
+void Reverb::IncDuration(float value)
+{
+    float v;
+    pthread_mutex_lock(&_mutex);
+    v = _duration + value;
+    if (v < 0.1)
+        v = 0.1;
+    SetDuration(v);
+    pthread_mutex_unlock(&_mutex);
 }
 
 void Reverb::Process()
@@ -48,10 +80,8 @@ void Reverb::Process()
     for (size_t i = 0; i < PcmSetting::BUFFER_LEN; i++)
     {
         AudioOut::_buffer[i] = 0;
-        float total = 0;
         for (size_t j = 0; j < _layer_size; j++)
         {
-            total += _layer_coef[j];
             current_layer = (_head_layer + j) % _layer_size;
             AudioOut::_buffer[i] += _buffers[current_layer][_head] * _layer_coef[j];
         }
@@ -69,4 +99,9 @@ void Reverb::Process()
         }
     }
     pthread_mutex_unlock(&_mutex);
+}
+
+void Reverb::print() const
+{
+    std::cout << "\r[ " << _duration << " ]" << "\t\t\t\t[ " << _layer_size << " ]\t\t\t\t\t" << std::flush;
 }

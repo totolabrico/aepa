@@ -22,9 +22,14 @@ private:
 public:
     Reverb();
     ~Reverb();
-    void SetDuration(float value);
+    size_t GetLayerSize() const;
+    float GetDuration() const;
     void SetLayerSize(size_t value);
+    void SetDuration(float value);
+    void IncLayerSize(int value);
+    void IncDuration(float value);
     void Process();
+    void print() const;
 };
 
 #endif
