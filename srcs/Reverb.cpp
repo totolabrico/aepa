@@ -5,8 +5,8 @@
 Reverb::Reverb() : _head(0), _head_layer(0)
 {
     pthread_mutex_init(&_mutex, NULL);
-    SetLayerSize(10);
-    SetDuration(0.1);
+    SetLayerSize(20);
+    SetDuration(0.7);
 }
 
 Reverb::~Reverb()
