@@ -39,7 +39,7 @@ void Reverb::SetLayerSize(size_t value)
             coef = 0;
         _layer_coef[i] = coef;
         // coef *= 2;
-        std::cout << "Layer " << i << " coef: " << _layer_coef[i] << std::endl;
+        // std::cout << "Layer " << i << " coef: " << _layer_coef[i] << std::endl;
     }
     if (_head_layer >= _layer_size)
         _head_layer = 0;
