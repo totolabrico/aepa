@@ -29,15 +29,11 @@ void Reverb::SetLayerSize(size_t value)
     _layer_size = value;
     _buffers.resize(_layer_size);
     _layer_coef.resize(_layer_size);
-    float coef = 0;
-    // float inc = 1.0 / (_layer_size + 1);
     float coef = 1 / pow(2, static_cast<float>(_layer_size));
     for (size_t i = 0; i < _layer_size; i++)
     {
-        // coef += inc;
         _layer_coef[i] = coef;
         coef *= 2;
-        // std::cout << "Layer " << i << " coef: " << _layer_coef[i] << std::endl;
     }
     if (_head_layer >= _layer_size)
         _head_layer = 0;
